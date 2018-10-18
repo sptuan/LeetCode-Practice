@@ -11,5 +11,5 @@ Dev-C++ 5.11
 ## Language Standard
 ISO C++ 11
 
-## 个人信息
+## Info
 邮箱： sptuan@steinslab.io
