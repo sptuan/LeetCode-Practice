@@ -262,3 +262,125 @@ int main() {
 &nbsp;
 
 &nbsp;
+
+<h4>1074 Reversing Linked List （25 分）</h4>
+Given a constant K and a singly linked list L, you are supposed to reverse the links of every K elements on L. For example, given L being 1→2→3→4→5→6, if K=3, then you must output 3→2→1→6→5→4; if K=4, you must output 4→3→2→1→5→6.
+
+Input Specification:
+Each input file contains one test case. For each case, the first line contains the address of the first node, a positive N (≤10​5​​) which is the total number of nodes, and a positive K (≤N) which is the length of the sublist to be reversed. The address of a node is a 5-digit nonnegative integer, and NULL is represented by -1.
+
+Then N lines follow, each describes a node in the format:
+
+Address Data Next
+
+where Address is the position of the node, Data is an integer, and Next is the position of the next node.
+
+Output Specification:
+For each case, output the resulting ordered linked list. Each node occupies a line, and is printed in the same format as in the input.
+
+Sample Input:
+00100 6 4
+00000 4 99999
+00100 1 12309
+68237 6 -1
+33218 3 00000
+99999 5 68237
+12309 2 33218
+
+Sample Output:
+00000 4 33218
+33218 3 12309
+12309 2 00100
+00100 1 99999
+99999 5 68237
+68237 6 -1
+
+&nbsp;
+<pre class="lang:default decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+using namespace std;
+
+
+
+int main() {
+	int data[100001]; 
+	int next[100001];	
+	int root,total,k;
+//	scanf("%d %d %d\n",&amp;root,&amp;total,&amp;k);
+	cin&gt;&gt;root&gt;&gt;total&gt;&gt;k;
+	int a,d,n;
+	int cc;
+	for(cc = 0;cc&lt;total; cc++){
+		//scanf("%d %d %d\n",&amp;a,&amp;d,&amp;n);
+		cin&gt;&gt;a&gt;&gt;d&gt;&gt;n;
+		data[a] = d;
+		next[a] = n;
+	}
+	
+	int round,rest;
+	if(total%k == 0){
+		round = total/k;
+		rest = 0;
+	}
+	else{
+		round = total/k;
+		rest = total%k;
+	}
+	int i,j;
+	int temp_root;
+	int last_tail;
+	for(i=0;i&lt;round;i++){
+
+		int temp_addr[k]; 
+		if(i==0){
+			temp_root = root;
+			for(j=0;j&lt;k;j++){
+				temp_addr[j]=temp_root;
+				temp_root=next[temp_root];
+			}
+			root = temp_addr[k-1];
+
+			for(j=0;j&lt;k;j++){
+				if(j==0){
+					next[temp_addr[j]]=temp_root;
+				}
+				else{
+					next[temp_addr[j]]=temp_addr[j-1];	
+				}
+			}
+			last_tail = temp_addr[0];
+			
+		} 
+		else{
+			for(j=0;j&lt;k;j++){
+				temp_addr[j]=temp_root;
+				temp_root=next[temp_root];
+			}
+			for(j=0;j&lt;k;j++){
+				if(j==0){
+					next[temp_addr[j]]=temp_root;
+				}
+				else{
+					next[temp_addr[j]]=temp_addr[j-1];	
+				}
+			}
+			next[last_tail] = temp_addr[k-1];
+			last_tail = temp_addr[0];
+		}
+	}
+	int cout_temp;
+	cout_temp=root;
+	
+	while(next[cout_temp]!=(-1)){
+		printf("%.5d %d %.5d\n",cout_temp,data[cout_temp],next[cout_temp]);
+		cout_temp=next[cout_temp];
+	}
+	printf("%.5d %d %d\n",cout_temp,data[cout_temp],next[cout_temp]);
+
+	return 0;
+}</pre>
+1 注意5位数的地址输出，最后用了printf
+
+&nbsp;
+
+最后还是有1个时间比较短的用例不通过，24分。各种情况后来都是尝试了，包括格式控制的疏忽等等，最后仍然没通过，原因待查中
