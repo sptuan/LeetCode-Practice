@@ -476,3 +476,123 @@ int main() {
 	return 0;
 }</pre>
 此题比较简单，貌似所有用例都是尾缀相同的；考虑到情况没做，试着秒一下直接通过了。
+
+
+
+<h3>DFS</h3>
+<h4>1103 Integer Factorization （30 分）</h4>
+The K−P factorization of a positive integer N is to write N as the sum of the P-th power of K positive integers. You are supposed to write a program to find the K−P factorization of N for any positive integers N, K and P.
+
+Input Specification:
+Each input file contains one test case which gives in a line the three positive integers N (≤400), K (≤N) and P (1&lt;P≤7). The numbers in a line are separated by a space.
+
+Output Specification:
+For each case, if the solution exists, output in the format:
+
+N = n[1]^P + ... n[K]^P
+
+where n[i] (i = 1, ..., K) is the i-th factor. All the factors must be printed in non-increasing order.
+
+Note: the solution may not be unique. For example, the 5-2 factorization of 169 has 9 solutions, such as 12​2​​+4​2​​+2​2​​+2​2​​+1​2​​, or 11​2​​+6​2​​+2​2​​+2​2​​+2​2​​, or more. You must output the one with the maximum sum of the factors. If there is a tie, the largest factor sequence must be chosen -- sequence { a​1​​,a​2​​,⋯,a​K​​ } is said to be larger than { b​1​​,b​2​​,⋯,b​K​​ } if there exists 1≤L≤K such that a​i​​=b​i​​ for i&lt;L and a​L​​&gt;b​L​​.
+
+If there is no solution, simple output Impossible.
+
+Sample Input 1:
+169 5 2
+
+Sample Output 1:
+169 = 6^2 + 6^2 + 6^2 + 6^2 + 5^2
+
+Sample Input 2:
+169 167 3
+
+Sample Output 2:
+Impossible
+
+&nbsp;
+<pre class="lang:c++ decode:true">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int N,K,P;
+vector&lt;int&gt; temp,ans;
+int flag = 0;
+int ans_sumD=0;
+int pre_n[401];
+
+
+void DFS(int temp_sum,int n,int counter,int sumD){
+	//temp_sum临时立方和，n选到的数，counter已选的数 ,sumD底数的和 
+	//死胡同条件 
+	if(((n&lt;1) || temp_sum&gt;N || counter &gt;K))
+	{
+		return; 
+	}
+	//符合条件
+	if(((temp_sum == N) &amp;&amp; (counter == K))) {
+		if(sumD &gt; ans_sumD){
+			ans_sumD = sumD;
+			ans = temp;
+		}
+		flag = 1;
+	} 
+	//开始DFS 
+	//选该n
+	temp.push_back(n);
+	DFS(temp_sum + pre_n[n],n,counter+1,sumD+n);
+	temp.pop_back();
+	//不选该N 
+	DFS(temp_sum,n-1,counter,sumD);
+	
+}
+
+int main() {
+	cin&gt;&gt;N&gt;&gt;K&gt;&gt;P;
+	int NN;
+	int i,j;
+	j=0;
+	int pre_flag = 0;
+	while(pre_flag == 0){
+		pre_n[j]=j;
+		for(i=0;i&lt;P-1;i++){
+			pre_n[j] =  pre_n[j]*j;
+		}
+		if(pre_n[j]&lt;=N){
+			NN = j;
+		}
+		if(pre_n[j]&gt;N){
+			pre_flag = 1;
+		}
+		j++;
+	}
+
+	
+	DFS(0,NN,0,0);
+	if(flag == 0){
+		cout&lt;&lt;"Impossible"&lt;&lt;endl;
+	}
+	else{
+		cout&lt;&lt;N&lt;&lt;" = ";
+		auto i = ans.begin();
+		for(i = ans.begin(); i !=ans.end();i++){
+			if(i !=(ans.end()-1)){
+				cout&lt;&lt;*i&lt;&lt;"^"&lt;&lt;P&lt;&lt;" + ";
+			}
+			else{
+				cout&lt;&lt;*i&lt;&lt;"^"&lt;&lt;P&lt;&lt;endl;
+			}
+		}
+	}
+	return 0; 
+} 
+//忽略了1 1 2极端条件</pre>
+忽略了1 1 2极端条件,后来在幂计算处修正
+
+必须预处理幂计算，否则直接超时，高阶运算非常耗时！
+
+另一个超时的问题，是不对幂计算进行剪枝
+
+&nbsp;
+
+注：不要太聚焦于示例输入，而导致未注意到KNP等参数变化
