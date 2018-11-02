@@ -596,3 +596,187 @@ int main() {
 &nbsp;
 
 注：不要太聚焦于示例输入，而导致未注意到KNP等参数变化
+&nbsp;
+<h3>BFS</h3>
+<h4>1091 Acute Stroke （30 分）</h4>
+One important factor to identify acute stroke (急性脑卒中) is the volume of the stroke core. Given the results of image analysis in which the core regions are identified in each MRI slice, your job is to calculate the volume of the stroke core.
+
+Input Specification:
+Each input file contains one test case. For each case, the first line contains 4 positive integers: M, N, L and T, where M and N are the sizes of each slice (i.e. pixels of a slice are in an M×N matrix, and the maximum resolution is 1286 by 128); L (≤60) is the number of slices of a brain; and T is the integer threshold (i.e. if the volume of a connected core is less than T, then that core must not be counted).
+
+Then L slices are given. Each slice is represented by an M×N matrix of 0's and 1's, where 1 represents a pixel of stroke, and 0 means normal. Since the thickness of a slice is a constant, we only have to count the number of 1's to obtain the volume. However, there might be several separated core regions in a brain, and only those with their volumes no less than T are counted. Two pixels are connected and hence belong to the same region if they share a common side, as shown by Figure 1 where all the 6 red pixels are connected to the blue one.
+
+【插图】
+
+Figure 1
+
+Output Specification:
+For each case, output in a line the total volume of the stroke core.
+
+Sample Input:
+3 4 5 2
+1 1 1 1
+1 1 1 1
+1 1 1 1
+0 0 1 1
+0 0 1 1
+0 0 1 1
+1 0 1 1
+0 1 0 0
+0 0 0 0
+1 0 1 1
+0 0 0 0
+0 0 0 0
+0 0 0 1
+0 0 0 1
+1 0 0 0
+
+Sample Output:
+26
+
+&nbsp;
+
+&nbsp;
+<pre class="lang:c++ decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;queue&gt;
+ 
+using namespace std;
+
+int M,N,L,T;
+int counter;
+
+int X[6]={0,0,0,0,1,-1};
+int Y[6]={0,0,1,-1,0,0};
+int Z[6]={1,-1,0,0,0,0};
+
+bool inq[60][128][1286] = {false};
+int img[60][128][1286];
+
+struct node{
+	int l;
+	int m;
+	int n;
+}Node;
+
+bool judge(int l, int m, int n){
+	if( (l&lt;0) || (l&gt;=L)
+			  || (m&lt;0) || (m&gt;=M)
+			  || (n&lt;0) || (n&gt;=N)){
+		
+		return false;
+	}
+	else{
+		if((img[l][m][n] == 1) &amp;&amp; inq[l][m][n] == false ){
+//			cout&lt;&lt;"judge true\n";
+			return true;
+		}
+		else{
+//			cout&lt;&lt;"judge false\n";
+			return false;
+		}
+	}
+}
+
+void BFS(int l, int m, int n){
+//	cout&lt;&lt;"BFS!"&lt;&lt;endl;
+	queue&lt;node&gt; Q;
+	if(inq[l][m][n] == false){
+		Node.l = l;
+		Node.m = m;
+		Node.n = n;
+		Q.push(Node);
+		inq[l][m][n] = true;
+		
+//		cout&lt;&lt;"Push In Q!"&lt;&lt;endl;
+	}
+	while(!Q.empty()){
+		Node = Q.front();
+		Q.pop();
+//		cout&lt;&lt;"POP!"&lt;&lt;endl;
+		if(img[Node.l][Node.m][Node.n] == 1){
+			counter++;
+//			cout&lt;&lt;"coutner:"&lt;&lt;counter&lt;&lt;endl;
+//			cout&lt;&lt;"Find!"&lt;&lt;endl;
+		}
+		
+		node nowNode;
+		int i;
+		for(i=0;i&lt;6;i++){
+			nowNode.l = Node.l + X[i];
+			nowNode.m = Node.m + Y[i];
+			nowNode.n = Node.n + Z[i];
+			if(judge(nowNode.l,nowNode.m,nowNode.n)){
+//				if(inq[nowNode.l][nowNode.m][nowNode.n] == false){
+				Q.push(nowNode);
+//				cout&lt;&lt;"Push Next Door."&lt;&lt;endl;
+				inq[nowNode.l][nowNode.m][nowNode.n] = true;	
+//				}
+			}
+		}
+	}
+
+	
+}
+
+int main() {
+
+
+	vector&lt;int&gt; sum;
+	int sumF=0;
+	
+	cin&gt;&gt;M&gt;&gt;N&gt;&gt;L&gt;&gt;T;
+	int i,j,k;
+	for(i=0;i&lt;L;i++){
+		for(j=0;j&lt;M;j++){
+			for(k=0;k&lt;N;k++){
+				scanf("%d",&amp;(img[i][j][k]));
+			}
+		}
+	}
+
+/*
+	for(i=0;i&lt;L;i++){
+		for(j=0;j&lt;M;j++){
+			for(k=0;k&lt;N;k++){
+				printf("%d ",(img[i][j][k]));
+			}
+			cout&lt;&lt;endl;
+		}
+	}	
+	*/
+	
+	for(i=0;i&lt;L;i++){
+		for(j=0;j&lt;M;j++){
+			for(k=0;k&lt;N;k++){
+				if((inq[i][j][k] == false) &amp;&amp; (img[i][j][k] == 1)){
+					counter = 0;
+					BFS(i,j,k);
+					if(counter !=0){
+						sum.push_back(counter);
+					}
+				}
+			}
+		}
+	}
+	
+	auto ii = sum.end();
+	for(ii = sum.begin();ii!=sum.end();ii++){
+		if(*ii&gt;=T){
+			sumF += *ii;
+		}
+	}
+	
+	cout&lt;&lt;sumF&lt;&lt;endl;
+	
+
+	return 0; 
+} 
+/*
+写BFS就应该相信自己的思路，因为已经理解了这东西，不要太依赖于教材。
+
+在遍历所有节点进行BFS时，应该及时剪枝，不合适的节点根本不让他进BFS，节省程序开销。
+最后一个例一直出错，对进入BFS的遍历进行限制之后成功，并且耗时大大减小。 
+*/</pre>
+&nbsp;
