@@ -780,3 +780,121 @@ int main() {
 最后一个例一直出错，对进入BFS的遍历进行限制之后成功，并且耗时大大减小。 
 */</pre>
 &nbsp;
+
+&nbsp;
+<h3>Tree</h3>
+<h4>1020 Tree Traversals （25 分）</h4>
+Suppose that all the keys in a binary tree are distinct positive integers. Given the postorder and inorder traversal sequences, you are supposed to output the level order traversal sequence of the corresponding binary tree.
+
+Input Specification:
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤30), the total number of nodes in the binary tree. The second line gives the postorder sequence and the third line gives the inorder sequence. All the numbers in a line are separated by a space.
+
+Output Specification:
+For each test case, print in one line the level order traversal sequence of the corresponding binary tree. All the numbers in a line must be separated by exactly one space, and there must be no extra space at the end of the line.
+
+Sample Input:
+7
+2 3 1 5 7 6 4
+1 2 3 4 5 6 7
+
+Sample Output:
+4 1 6 3 5 7 2
+
+&nbsp;
+<pre class="lang:c++ decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;queue&gt;
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+
+using namespace std;
+
+struct node{
+	int data;
+	node* lchild;
+	node* rchild;
+};
+
+int post[30];
+int in[30];
+int N;
+
+node* create(int posti,int postj, int ini, int inj){
+	//cout&lt;&lt;"posti:"&lt;&lt;posti&lt;&lt;" postj:"&lt;&lt;postj&lt;&lt;" ini"&lt;&lt;ini&lt;&lt;" inj"&lt;&lt;inj&lt;&lt;endl;
+	if(postj &lt; posti){
+		//cout&lt;&lt;"NULL"&lt;&lt;endl;
+		return NULL;
+	}
+	if(posti&lt;0 || postj&lt;0 || ini&lt;0 || inj&lt;0){
+		//cout&lt;&lt;"NULL"&lt;&lt;endl;
+		return NULL;
+	}
+	node* root = new node;
+	root-&gt;data = post[postj];
+	//cout&lt;&lt;"Node:"&lt;&lt;root-&gt;data&lt;&lt;endl;
+	
+	if(posti==postj){
+		root-&gt;lchild = NULL;
+		root-&gt;rchild = NULL;
+		return root;
+	}
+	
+	//开始寻找根节点
+	int i=0;
+	int counter=0;
+	do{
+		if(in[ini+i] == post[postj]){
+			counter = ini+i;
+		}
+		i++;
+	}while(counter == 0 &amp;&amp; i&lt;N);
+
+	//counter-ini要统一，用来判断存在与否 
+	 
+	root-&gt;lchild = create(posti,posti+(counter-ini)-1,ini,ini+(counter-ini)-1);
+	root-&gt;rchild = create(postj-1+1-(inj-counter),postj-1,counter+1,inj);
+	return root;
+}
+
+void BFS(node* root){
+	queue&lt;node*&gt; Q;
+	Q.push(root);
+	int j=0; 
+	while(!Q.empty()){
+		if(j!=N-1){
+			cout&lt;&lt;Q.front()-&gt;data&lt;&lt;" ";	
+			j++;
+		}
+		else{
+			cout&lt;&lt;Q.front()-&gt;data&lt;&lt;endl;
+		}
+		
+		if(Q.front()-&gt;lchild != NULL){
+			Q.push((Q.front())-&gt;lchild);
+		}
+		if(Q.front()-&gt;rchild != NULL){
+			Q.push((Q.front())-&gt;rchild);
+		}
+		Q.pop();
+	}
+}
+
+
+int main() {
+	cin&gt;&gt;N;
+	int i,j,k;
+	for(i = 0; i &lt; N; i++){
+		cin&gt;&gt;post[i]; 
+	}
+	for(i = 0; i &lt; N; i++){
+		cin&gt;&gt;in[i];
+	}
+	//cout&lt;&lt;"Cin OK!"&lt;&lt;endl;
+	node* root;
+	root = create(0,N-1,0,N-1);
+	BFS(root);
+	return 0;
+}</pre>
+&nbsp;
+
+树的中序和后序创建，加一层DFS
