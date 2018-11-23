@@ -1152,3 +1152,91 @@ int main() {
 	return 0;
 }</pre>
 //计算cache，高阶乘法会导致最后一个算力超时！多次尝试发现有高达100000的tier。 //On复杂度缓存价格，用内存换时间
+
+
+
+&nbsp;
+
+&nbsp;
+<h4>1004 Counting Leaves （30 分）</h4>
+A family hierarchy is usually presented by a pedigree tree. Your job is to count those family members who have no child.
+
+Input Specification:
+Each input file contains one test case. Each case starts with a line containing 0&lt;N&lt;100, the number of nodes in a tree, and M (&lt;N), the number of non-leaf nodes. Then M lines follow, each in the format:
+
+ID K ID[1] ID[2] ... ID[K]
+
+where ID is a two-digit number representing a given non-leaf node, K is the number of its children, followed by a sequence of two-digit ID's of its children. For the sake of simplicity, let us fix the root ID to be 01.
+
+The input ends with N being 0. That case must NOT be processed.
+
+Output Specification:
+For each test case, you are supposed to count those family members who have no child for every seniority level starting from the root. The numbers must be printed in a line, separated by a space, and there must be no extra space at the end of each line.
+
+The sample case represents a tree with only 2 nodes, where 01 is the root and 02 is its only child. Hence on the root 01level, there is 0 leaf node; and on the next level, there is 1 leaf node. Then we should output 0 1 in a line.
+
+Sample Input:
+2 1
+01 1 02
+
+Sample Output:
+0 1
+<pre class="lang:c++ decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;queue&gt;
+using namespace std;
+
+vector&lt;int&gt; child[100];
+queue&lt;int&gt; q[101];
+
+void DFS(int root){
+	q[0].push(root);
+	int floor;
+	int flag = 0;
+	int counter = 0;
+	
+	while(!q[counter].empty()){
+		int tick=0;
+		while(!q[counter].empty()){
+			int temp = q[counter].front();
+			if(child[temp].empty()){
+				tick++;
+			}
+			else{
+				auto j = child[temp].begin();
+				for(j = child[temp].begin(); j!=child[temp].end(); j++){
+					q[counter+1].push(*j);
+				}
+			}
+			q[counter].pop();
+		}
+		cout&lt;&lt;tick;
+		counter++;
+		if(!q[counter].empty()){
+			cout&lt;&lt;" ";
+		}
+	}
+}
+
+int main(){
+	int N,M;
+	cin&gt;&gt;N&gt;&gt;M;
+	
+	int i,j,k;
+	for(i=0;i&lt;M;i++){
+		int counter;
+		cin&gt;&gt;counter&gt;&gt;k;
+		for(j=0;j&lt;k;j++){
+			int temp_child;
+			scanf("%d",&amp;temp_child);
+			child[counter].push_back(temp_child);
+		}	
+	}
+	
+	DFS(1);
+	
+	
+	return 0;
+}</pre>
+简单的静态树存储于层级罗列
