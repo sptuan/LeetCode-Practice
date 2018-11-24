@@ -1240,3 +1240,270 @@ int main(){
 	return 0;
 }</pre>
 简单的静态树存储于层级罗列
+
+
+&nbsp;
+<h3>BST</h3>
+<h4>1043 Is It a Binary Search Tree （25 分）</h4>
+A Binary Search Tree (BST) is recursively defined as a binary tree which has the following properties:
+
+The left subtree of a node contains only nodes with keys less than the node's key.
+The right subtree of a node contains only nodes with keys greater than or equal to the node's key.
+Both the left and right subtrees must also be binary search trees.
+If we swap the left and right subtrees of every node, then the resulting tree is called the Mirror Image of a BST.
+
+Now given a sequence of integer keys, you are supposed to tell if it is the preorder traversal sequence of a BST or the mirror image of a BST.
+
+Input Specification:
+Each input file contains one test case. For each case, the first line contains a positive integer N (≤1000). Then N integer keys are given in the next line. All the numbers in a line are separated by a space.
+
+Output Specification:
+For each test case, first print in a line YES if the sequence is the preorder traversal sequence of a BST or the mirror image of a BST, or NO if not. Then if the answer is YES, print in the next line the postorder traversal sequence of that tree. All the numbers in a line must be separated by a space, and there must be no extra space at the end of the line.
+
+Sample Input 1:
+7
+8 6 5 7 10 8 11
+
+Sample Output 1:
+YES
+5 7 6 8 11 10 8
+
+Sample Input 2:
+7
+8 10 11 8 6 7 5
+
+Sample Output 2:
+YES
+11 8 10 7 5 6 8
+
+Sample Input 3:
+7
+8 6 8 5 10 9 11
+
+Sample Output 3:
+NO
+
+作者: CHEN, Yue
+单位: 浙江大学
+时间限制: 400 ms
+内存限制: 64 MB
+代码长度限制: 16 KB
+
+&nbsp;
+
+&nbsp;
+<pre class="lang:c++ decode:true ">#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+int seq[1000];
+int rchild[1000];
+int lchild[1000];
+int rev_flag = 0; //0不反转 1反转 
+int check_flag = 0; //0 YES 1 NO
+
+struct node{
+	int data;
+	node *lchild;
+	node *rchild;
+}; 
+
+node *build(int l, int r){
+//	cout&lt;&lt;"Build "&lt;&lt;l&lt;&lt;"-"&lt;&lt;r&lt;&lt;endl;
+	if(l&gt;=r){
+		return NULL;
+	}
+	else{
+		node* root = new node;
+		root-&gt;data = seq[l];
+//		cout&lt;&lt;"Added "&lt;&lt;root-&gt;data&lt;&lt;endl;
+
+		
+		if(rev_flag == 0)//不反转
+		{
+			int i=l+1;
+			while(i &lt; r &amp;&amp; seq[i] &lt; seq[l]) {
+				i++;
+			}
+				root-&gt;lchild = build(l+1,i);
+				root-&gt;rchild = build(i,r);
+			
+			
+
+			
+		}
+		else if(rev_flag == 1)//反转 
+		{
+			int i=l+1;
+			while(i &lt; r &amp;&amp; seq[i] &gt;= seq[l]) {
+				i++;
+			}
+			
+
+				root-&gt;lchild = build(l+1,i);
+				root-&gt;rchild = build(i,r);
+			
+
+		}
+		return root;
+	}
+
+} 
+
+int temp_max,temp_min;
+
+void findMax(node* root){
+	if(temp_max&lt;root-&gt;data){
+		temp_max = root-&gt;data;
+	}
+	
+	if(root-&gt;lchild != NULL){
+		findMax(root-&gt;lchild);
+	}
+	if(root-&gt;rchild != NULL){
+		findMax(root-&gt;rchild);
+	}
+}
+
+void findMin(node* root){
+	if(temp_min &gt; root-&gt;data){
+		temp_min = root-&gt;data;
+	}
+	
+	if(root-&gt;lchild != NULL){
+		findMin(root-&gt;lchild);
+	}
+	if(root-&gt;rchild != NULL){
+		findMin(root-&gt;rchild);
+	}
+}
+
+
+
+
+void check(node* root){
+	int data = root-&gt;data;
+	
+//	cout&lt;&lt;"Checking root."&lt;&lt;"data:"&lt;&lt;root-&gt;data;
+		if(root-&gt;lchild != NULL){
+//			cout&lt;&lt;" lchild"&lt;&lt;root-&gt;lchild-&gt;data;
+		}
+		if(root-&gt;rchild != NULL){
+//			cout&lt;&lt;" rchild"&lt;&lt;root-&gt;rchild-&gt;data;
+		}
+//	cout&lt;&lt;endl;
+	
+
+	if(rev_flag == 0){
+		if(root-&gt;lchild != NULL){
+			
+			temp_max = root-&gt;lchild-&gt;data;
+			findMax(root-&gt;lchild);
+//			cout&lt;&lt;"Find Max:"&lt;&lt;temp_max&lt;&lt;endl;
+			if(temp_max &gt;= data){
+				check_flag = 1;
+//				cout&lt;&lt;"flag = 1"&lt;&lt;endl;
+//				cout&lt;&lt;"CMP"&lt;&lt;data&lt;&lt;"&amp;"&lt;&lt;(root-&gt;lchild)-&gt;data&lt;&lt;" "&lt;&lt;"flag = 1"&lt;&lt;endl;
+			}
+			check(root-&gt;lchild);
+
+		}
+		if(root-&gt;rchild != NULL){
+			
+			temp_min = root-&gt;rchild-&gt;data;
+			findMin(root-&gt;rchild);
+//			cout&lt;&lt;"Find Min:"&lt;&lt;temp_min&lt;&lt;endl;
+			if(temp_min &lt; data){
+				check_flag = 1;
+//				cout&lt;&lt;"flag = 1"&lt;&lt;endl;
+//				cout&lt;&lt;"CMP"&lt;&lt;data&lt;&lt;"&amp;"&lt;&lt;(root-&gt;rchild)-&gt;data&lt;&lt;" "&lt;&lt;"flag = 1"&lt;&lt;endl;
+			}
+			check(root-&gt;rchild);
+		}
+	}
+
+	if(rev_flag == 1){
+		int data = root-&gt;data;
+		if(root-&gt;lchild != NULL){
+			temp_min = root-&gt;lchild-&gt;data;
+			findMin(root-&gt;lchild);
+//			cout&lt;&lt;"Find Min:"&lt;&lt;temp_min&lt;&lt;endl;
+			if(temp_min &lt; data){
+				check_flag = 1;
+//				cout&lt;&lt;"CMP"&lt;&lt;data&lt;&lt;"&amp;"&lt;&lt;(root-&gt;lchild)-&gt;data&lt;&lt;" "&lt;&lt;"flag = 1"&lt;&lt;endl;
+			}
+			check(root-&gt;lchild);
+		}
+		if(root-&gt;rchild != NULL){
+			temp_max = root-&gt;rchild-&gt;data;
+			findMax(root-&gt;rchild);
+//			cout&lt;&lt;"Find Max:"&lt;&lt;temp_max&lt;&lt;endl;
+			if(temp_max &gt;= data){
+				check_flag = 1;
+//				cout&lt;&lt;"CMP"&lt;&lt;data&lt;&lt;"&amp;"&lt;&lt;(root-&gt;rchild)-&gt;data&lt;&lt;" "&lt;&lt;"flag = 1"&lt;&lt;endl;
+			}
+			check(root-&gt;rchild);
+		}
+	}
+
+}
+
+
+
+
+
+void postorder(node* root){
+	if(root-&gt;lchild!=NULL){
+		postorder(root-&gt;lchild);
+	}
+	if(root-&gt;rchild!=NULL){
+		postorder(root-&gt;rchild);
+	}
+	cout&lt;&lt;root-&gt;data&lt;&lt;" ";
+}
+
+void postorder_1st(node* root){
+	if(root-&gt;lchild!=NULL){
+		postorder(root-&gt;lchild);
+	}
+	if(root-&gt;rchild!=NULL){
+		postorder(root-&gt;rchild);
+	}
+	cout&lt;&lt;root-&gt;data;
+}
+
+
+int main(){
+	
+	int N;
+	cin&gt;&gt;N;
+	int i,j,k;
+	for(i = 0; i &lt; N; i++){
+		cin&gt;&gt;seq[i];
+	}
+	
+	if(seq[0]&gt;seq[1]){
+		rev_flag = 0;
+	} 
+	else{
+		rev_flag = 1;
+	}
+	
+	node* root;
+	root = build(0,N);
+	
+//	cout&lt;&lt;"Build Complete!"&lt;&lt;endl;
+	check(root);
+	
+	if(check_flag == 1){
+		cout&lt;&lt;"NO"&lt;&lt;endl;
+	}
+	else{
+		cout&lt;&lt;"YES"&lt;&lt;endl;
+		postorder_1st(root);
+	}
+	
+	return 0;
+}</pre>
+具体记录在笔记里。尝试了动态写法，注意结构体传递
