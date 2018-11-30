@@ -1507,3 +1507,173 @@ int main(){
 	return 0;
 }</pre>
 具体记录在笔记里。尝试了动态写法，注意结构体传递
+
+
+
+<h3>Dijkstra</h3>
+<h4>1030 Travel Plan （30 分）</h4>
+A traveler's map gives the distances between cities along the highways, together with the cost of each highway. Now you are supposed to write a program to help a traveler to decide the shortest path between his/her starting city and the destination. If such a shortest path is not unique, you are supposed to output the one with the minimum cost, which is guaranteed to be unique.
+
+Input Specification:
+Each input file contains one test case. Each case starts with a line containing 4 positive integers N, M, S, and D, where N (≤500) is the number of cities (and hence the cities are numbered from 0 to N−1); M is the number of highways; S and Dare the starting and the destination cities, respectively. Then M lines follow, each provides the information of a highway, in the format:
+
+City1 City2 Distance Cost
+
+where the numbers are all integers no more than 500, and are separated by a space.
+
+Output Specification:
+For each test case, print in one line the cities along the shortest path from the starting point to the destination, followed by the total distance and the total cost of the path. The numbers must be separated by a space and there must be no extra space at the end of output.
+
+Sample Input:
+4 5 0 3
+0 1 1 20
+1 3 2 30
+0 3 4 10
+0 2 2 20
+2 3 1 20
+
+Sample Output:
+0 2 3 3 40
+
+&nbsp;
+<pre class="lang:c++ decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+
+#define INF 1000000000
+#define MAXV 510
+
+using namespace std;
+
+int N,M,S,D;
+
+int G[MAXV][MAXV];
+int cost[MAXV][MAXV];
+
+int n[MAXV],d[MAXV],c[MAXV];
+bool vis[MAXV] = {false};
+vector&lt;int&gt; pre[MAXV];
+
+
+void dijkstra(int s){
+	n[s] = 1;
+	d[s] = 0;
+	c[s] = 0;
+	
+	int i,j,k;
+
+	for(i=0;i&lt;N;i++){
+		
+			//先找最小值 
+//		cout&lt;&lt;"Round Start!"&lt;&lt;endl;
+		int u = -1;
+		int MIN = INF;
+		for(j=0;j&lt;N;j++){
+			if(vis[j] == false &amp;&amp; d[j]&lt;MIN){
+				u = j;
+				MIN = d[j];
+			}
+		}
+		if(u==-1){
+//			cout&lt;&lt;"Failed"&lt;&lt;endl;
+			return;
+		}
+//		cout&lt;&lt;"Find Min:"&lt;&lt;u&lt;&lt;endl;
+		vis[u] = true;
+		
+		for(j=0;j&lt;N;j++){
+			if(G[u][j]!=INF){
+//				cout&lt;&lt;"Detecting:"&lt;&lt;u&lt;&lt;"-&gt;"&lt;&lt;j&lt;&lt;"  G="&lt;&lt;G[u][j]&lt;&lt;endl;
+				if(vis[j]==false &amp;&amp; (d[u]+G[u][j])&lt;d[j]){
+					d[j]=d[u]+G[u][j];
+					pre[j].clear();
+					pre[j].push_back(u);
+//					cout&lt;&lt;"&lt;&lt;&lt;&lt;&lt;&lt;"&lt;&lt;j&lt;&lt;endl;
+				}
+				else if(vis[j]==false &amp;&amp; (d[u]+G[u][j])==d[j]){
+					pre[j].push_back(u);
+//					cout&lt;&lt;"======"&lt;&lt;u&lt;&lt;endl;
+				}
+			}
+		}
+	}
+}
+
+int num=0;
+int minCost=INF;
+vector&lt;int&gt; tempPath;
+vector&lt;int&gt; Path;
+
+void DFS(int d){
+//	cout&lt;&lt;"DFS:"&lt;&lt;d&lt;&lt;endl;
+	if(d==S){
+		tempPath.push_back(d);
+//		cout&lt;&lt;"Push Back:"&lt;&lt;d&lt;&lt;endl;
+		auto i = tempPath.begin();
+		int tempCost = 0;
+		for(i;i!=(tempPath.end()-1);i++){
+			tempCost+=cost[*i][*(i+1)];
+//			cout&lt;&lt;"cost|"&lt;&lt;*i&lt;&lt;"+"&lt;&lt;*(i+1)&lt;&lt;endl;
+		}
+//		cout&lt;&lt;"tempCost="&lt;&lt;tempCost&lt;&lt;endl;
+		if(tempCost&lt;minCost){
+			minCost = tempCost;
+			Path = tempPath;
+		}
+
+//		cout&lt;&lt;"Pop out"&lt;&lt;tempPath.back()&lt;&lt;endl;
+		tempPath.pop_back();
+		
+		return;
+	}
+	
+	tempPath.push_back(d);
+//	cout&lt;&lt;"Push Back:"&lt;&lt;d&lt;&lt;endl;
+	auto i=pre[d].begin();
+	for(i;i!=pre[d].end();i++){
+		DFS(*i);
+		//cout&lt;&lt;"Pop out"&lt;&lt;tempPath.back()&lt;&lt;endl;
+		//tempPath.pop_back();
+	}
+	
+//	cout&lt;&lt;"Pop out"&lt;&lt;tempPath.back()&lt;&lt;endl;
+	tempPath.pop_back();
+
+}
+
+int main(){
+	cin&gt;&gt;N&gt;&gt;M&gt;&gt;S&gt;&gt;D;
+	int i,j,k;
+	for(i=0;i&lt;N;i++){
+		for(j=0;j&lt;N;j++){
+			G[i][j] = INF;
+		}
+		n[i] = 0;
+		d[i] = INF;
+		c[i] = INF;
+	}
+	for(i=0;i&lt;M;i++){
+		int c1,c2,D,C;
+		cin&gt;&gt;c1&gt;&gt;c2&gt;&gt;D&gt;&gt;C;
+		G[c1][c2] = D;
+		G[c2][c1] = D;
+		cost[c1][c2] = C;
+		cost[c2][c1] = C;
+	}
+//	cout&lt;&lt;"Init Complete!dijkstra-"&lt;&lt;endl;
+	dijkstra(S);
+//	cout&lt;&lt;"DFS"&lt;&lt;endl;
+	DFS(D);
+	auto m=Path.end()-1;
+	int counter=0;
+	for(m;m!=Path.begin();m--){
+		cout&lt;&lt;*m&lt;&lt;" ";
+		counter++;
+	}
+	cout&lt;&lt;*m&lt;&lt;" ";
+	counter++;
+	cout&lt;&lt;d[D]&lt;&lt;" "&lt;&lt;minCost&lt;&lt;endl;
+	
+	return 0;
+}</pre>
+&nbsp;
