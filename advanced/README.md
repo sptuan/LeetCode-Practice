@@ -1677,3 +1677,142 @@ int main(){
 	return 0;
 }</pre>
 &nbsp;
+
+
+
+<h4>1003 Emergency （25 分）</h4>
+As an emergency rescue team leader of a city, you are given a special map of your country. The map shows several scattered cities connected by some roads. Amount of rescue teams in each city and the length of each road between any pair of cities are marked on the map. When there is an emergency call to you from some other city, your job is to lead your men to the place as quickly as possible, and at the mean time, call up as many hands on the way as possible.
+
+Input Specification:
+Each input file contains one test case. For each test case, the first line contains 4 positive integers: N (≤500) - the number of cities (and the cities are numbered from 0 to N−1), M - the number of roads, C​1​​ and C​2​​ - the cities that you are currently in and that you must save, respectively. The next line contains Nintegers, where the i-th integer is the number of rescue teams in the i-th city. Then M lines follow, each describes a road with three integers c​1​​, c​2​​ and L, which are the pair of cities connected by a road and the length of that road, respectively. It is guaranteed that there exists at least one path from C​1​​ to C​2​​.
+
+Output Specification:
+For each test case, print in one line two numbers: the number of different shortest paths between C​1​​ and C​2​​, and the maximum amount of rescue teams you can possibly gather. All the numbers in a line must be separated by exactly one space, and there is no extra space allowed at the end of a line.
+
+Sample Input:
+5 6 0 2
+1 2 1 5 3
+0 1 1
+0 2 2
+0 3 1
+1 2 1
+2 4 1
+3 4 1
+
+Sample Output:
+2 4
+
+&nbsp;
+<pre class="lang:c++ decode:true ">#include &lt;iostream&gt;
+#include &lt;cstdio&gt;
+#include &lt;vector&gt;
+#include &lt;queue&gt;
+
+#define INF 1000000000
+#define MAXV 510
+
+using namespace std;
+//G为图；res为点权；
+//d[]为起点到各点最小距离；w[]为最大点权
+//n为最小路径数目 
+int G[MAXV][MAXV];
+int res[MAXV];
+int d[MAXV],w[MAXV],n[MAXV];
+bool vis[MAXV] = {false}; 
+int N,M,C1,C2;
+
+
+void dijkstra(int s){
+	int i,j;
+	for(i=0; i&lt;MAXV; i++){
+		d[i] = INF;
+		w[i] = 0;
+		n[i] = 0;
+	}
+	d[s] = 0;
+	w[s] = res[s];
+	n[s] = 1;
+	
+	//循环N次 
+	for(i=0; i&lt;N; i++){
+//		cout&lt;&lt;"---- Round "&lt;&lt;i&lt;&lt;" ----"&lt;&lt;endl;
+		//先找可到达的最短距离点
+		int u=-1;
+		int MIN = INF;
+		 
+		 for(j=0;j&lt;N;j++){
+		 	if(vis[j]==false &amp;&amp; d[j] &lt; MIN){
+		 		u = j;
+		 		MIN = d[j];
+			 } 
+		 }
+		 
+//		 cout&lt;&lt;"Find min target: "&lt;&lt;u&lt;&lt;endl;
+		 
+		 if(u == -1) {
+		 	return;
+//		 	cout&lt;&lt;"Failed"&lt;&lt;endl;
+		 }
+		 //一定记得标记已访问
+		 vis[u] = true;
+		 
+		 //然后找以d为起点，可到达点是否能更新距离信息 
+		 for(j=0; j&lt;N; j++){
+		 	//此处注意筛选，需要非INF才进入
+			 if(G[u][j]!=INF){
+			 	if(vis[j] == false &amp;&amp; (G[u][j]+d[u])&lt;d[j]){
+		 		//开始更新 
+			 		d[j] = G[u][j]+d[u];
+					w[j] = w[u]+res[j];
+					n[j] = n[u]; 
+//					cout&lt;&lt;"Update &lt;&lt; d["&lt;&lt;j&lt;&lt;endl;
+				}
+				 else if(vis[j]==false &amp;&amp; (G[u][j]+d[u])==d[j]){
+				 	if(w[u]+res[j]&gt;w[j]){
+				 		w[j] = w[u]+res[j];
+//				 		cout&lt;&lt;"Update == w["&lt;&lt;j&lt;&lt;endl;
+					 }
+					 
+					 //最短路径和权值无关，写在外面
+					 n[j] += n[u]; 
+//					 cout&lt;&lt;"Update == n["&lt;&lt;j&lt;&lt;endl;
+				}
+			 	
+			 } 
+
+		 } 
+	}
+	 
+}
+ 
+int main(){
+
+	cin&gt;&gt;N&gt;&gt;M&gt;&gt;C1&gt;&gt;C2;
+	
+	int i,j,k;
+	for(i=0; i&lt;N; i++) {
+		cin&gt;&gt;res[i];
+	}
+	
+	//初始化图G 
+	for(i=0;i&lt;MAXV;i++){
+		for(j=0;j&lt;MAXV;j++){
+			G[i][j] = INF;
+		}
+	}
+	
+	//写入图G 
+	for(i=0; i&lt;M; i++){
+		int c1,c2,L;
+		cin&gt;&gt;c1&gt;&gt;c2&gt;&gt;L;
+		G[c1][c2] = L;
+		G[c2][c1] = L; 
+	}
+//	cout&lt;&lt;"digkstra!"&lt;&lt;endl;
+	dijkstra(C1);
+	
+	cout&lt;&lt;n[C2]&lt;&lt;" "&lt;&lt;w[C2];
+	
+	return 0;
+}</pre>
+&nbsp;
