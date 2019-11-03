@@ -1,0 +1,32 @@
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        //dp_table
+        int dp[prices.size()+1][2+1][2];
+        
+        //init dp
+        dp[0][0][0] = 0;
+        dp[0][0][1] = INT_MIN/2;
+        dp[0][1][0] = INT_MIN/2;
+        dp[0][1][1] = INT_MIN/2;
+        dp[0][2][0] = INT_MIN/2;
+        dp[0][2][1] = INT_MIN/2;
+
+        for(int i=1; i<=prices.size(); i++){
+            for(int k=0;k<=2;k++){
+                if(k==0){
+                    dp[i][k][0] = dp[i-1][k][0];
+                    dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k][0] - prices[i-1]);
+                }
+                else{
+                    dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k-1][1] + prices[i-1]);
+                    dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k][0] - prices[i-1]);                   
+                }
+            }
+        }
+
+        int ans=max(dp[prices.size()][2][0],dp[prices.size()][1][0]);
+        if(ans>0) return ans;
+        else return 0;
+    }
+};
