@@ -1,3 +1,6 @@
+# LeetCode-Practice
+算法练习用仓库
+
 # PAT-Practice
 我正在准备2019年9月的PAT。这里是我的解题记录汇总。
 根目录下使用Advanced和Basic文件夹区分题目。本仓库仅作为纪录。
